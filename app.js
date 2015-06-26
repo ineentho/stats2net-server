@@ -12,6 +12,7 @@ app.use(server.router.routes());
 const koaServer = http.Server(app.callback());
 server.socketServer(addon.csEvents, koaServer);
 
-const port = process.env.port || 8080;
-koaServer.listen(port);
+const port = process.env.OPENSHIFT_IOJS_PORT || process.env.PORT || 3000;
+const ip = process.env.OPENSHIFT_IOJS_IP || "127.0.0.1";
+koaServer.listen(port, ip);
 console.log('Server listening on port ' + port);
