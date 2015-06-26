@@ -13,6 +13,6 @@ const koaServer = http.Server(app.callback());
 server.socketServer(addon.csEvents, koaServer);
 
 const port = process.env.OPENSHIFT_IOJS_PORT || process.env.PORT || 8080;
-const ip = process.env.OPENSHIFT_IOJS_IP || "127.0.0.1";
+const ip = process.env.NODE_IP || "127.0.0.1";
 koaServer.listen(port, ip);
 console.log('Server listening on port ' + port);
