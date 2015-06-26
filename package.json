@@ -5,7 +5,7 @@
   "main": "start.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "forever start app.js"
   },
   "engines": {
     "node": ">= 0.12.0"
@@ -13,6 +13,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cluster": "^0.7.7",
+    "forever": "^0.14.1",
     "koa": "^0.21.0",
     "koa-bodyparser": "^2.0.0",
     "koa-router": "^5.1.2",
