@@ -10,6 +10,7 @@ const csEvents = module.exports.csEvents = new events.EventEmitter();
 addon.get('/action', function *(next) {
     var q = this.query;
     if (q.type === 'kill') {
+        q.test = 'test';
         csEvents.emit('kill', q);
     }
 });
