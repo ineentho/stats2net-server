@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd $OPENSHIFT_REPO_DIR
+
+npm install --production
+npm prune
