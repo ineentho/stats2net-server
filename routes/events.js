@@ -7,12 +7,12 @@ const co    = require('co'),
  * How much ranking means, a low number means that players with only a little more ELO is
  * likely to win.
  */
-const RANKING_IMPORTANCE = 400;
+const RANKING_IMPORTANCE = 1000;
 
 /**
  * How much elo should be changed for each kill, higher means elo moves faster
  */
-const ELO_SPEED = 32;
+const ELO_SPEED = 6;
 
 function getEloChange(attacker, victim) {
     const attackerProbability = 1 / (1 + Math.pow(10, (attacker.elo - victim.elo) / RANKING_IMPORTANCE));
@@ -47,19 +47,21 @@ module.exports = function Events(gameEvents, database, io) {
                 const eloChange = getEloChange(attacker, victim);
 
                 attacker.elo += eloChange;
+                attacker.kills++;
                 victim.elo -= eloChange;
+                victim.deaths++;
 
 
                 io.emit('kill', {
                     attacker: {
                         displayName: attacker.displayName,
-                        elo: attacker.elo
+                        elo: Math.round(attacker.elo * 100) / 100
                     },
                     victim: {
                         displayName: victim.displayName,
-                        elo: victim.elo
+                        elo: Math.round(victim.elo * 100) / 100
                     },
-                    eloChange: eloChange
+                    eloChange: Math.round(eloChange * 100) / 100
                 });
 
 

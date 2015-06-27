@@ -15,7 +15,7 @@ module.exports = function Player(sequelize) {
         steamID: {type: Sequelize.STRING, unique: true},
         kills: {type: Sequelize.INTEGER, defaultValue: 0},
         deaths: {type: Sequelize.INTEGER, defaultValue: 0},
-        elo: {type: Sequelize.INTEGER, defaultValue: 2000}
+        elo: {type: Sequelize.DOUBLE, defaultValue: 2000}
     });
 
     Player.getPlayer = function *(player) {
