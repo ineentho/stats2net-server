@@ -18,7 +18,19 @@ module.exports = function Addon(database, events) {
     router.get('/action', function *(next) {
         var q = this.query;
         if (q.type === 'kill') {
-            events.emit('kill', q);
+            var victim = {
+                name: q.victimName,
+                steam: q.victimSteam
+            };
+            var attacker = {
+                name: q.attackerName,
+                steam: q.attackerSteam
+            };
+            events.emit('kill', {
+                attacker: attacker,
+                victim: victim,
+                headshot: q.headshot
+            });
         } else if (q.type === 'serverstart') {
             console.log('Plugin loaded');
             events.emit('map', q.map);

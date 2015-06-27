@@ -33,7 +33,7 @@ const Player = require('./models/player')(sequelize);
  * Sync all model tables
  */
 function *syncDbs() {
-    yield Player.sync({force: true});
+    yield Player.sync();
 }
 
 module.exports = {
