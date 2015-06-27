@@ -19,6 +19,12 @@ module.exports = function Addon(database, events) {
         var q = this.query;
         if (q.type === 'kill') {
             events.emit('kill', q);
+        } else if (q.type === 'serverstart') {
+            console.log('Plugin loaded');
+            events.emit('map', q.map);
+        } else if (q.type === 'map') {
+            console.log('Map: ' + q.map);
+            events.emit('map', q.map);
         }
         this.body = 'OK';
     });
