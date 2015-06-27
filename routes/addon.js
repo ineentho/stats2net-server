@@ -1,19 +1,29 @@
-const Router = require('koa-router'),
-      events = require('events');
+'use strict';
 
-const addon = module.exports.router = new Router({
-    prefix: '/addon'
-});
+const Router = require('koa-router');
 
-const csEvents = module.exports.csEvents = new events.EventEmitter();
+module.exports = function Addon(database, events) {
 
-addon.get('/action', function *(next) {
-    var q = this.query;
-    if (q.type === 'kill') {
-        csEvents.emit('kill', q);
+    /**
+     * Start the http router responsible for handling things sent by the
+     * CS server
+     */
+    const router = new Router({
+        prefix: '/addon'
+    });
+
+    /**
+     * An in-game event has happened (such as a connection or a kill)
+     */
+    router.get('/action', function *(next) {
+        var q = this.query;
+        if (q.type === 'kill') {
+            events.emit('kill', q);
+        }
+        this.body = 'OK';
+    });
+
+    return {
+        router: router
     }
-});
-
-addon.get('/2', function *(next) {
-    this.body = 'Addon 2';
-});
+};

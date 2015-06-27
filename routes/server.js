@@ -1,23 +1,39 @@
+'use strict';
+
 const Router   = require('koa-router'),
       socketIO = require('socket.io');
 
+module.exports = function Server(database, events) {
 
-const server = module.exports.router = new Router({
-    prefix: '/server'
-});
+    /**
+     * Start the socket.io server responsible for redirecting events to the
+     * websocket connection
+     */
+    function startSocketServer(server) {
+        const io = socketIO(server);
 
-module.exports.socketServer = function (events, server) {
-    const io = socketIO(server);
+        events.on('kill', function (data) {
+            io.emit('kill', data);
+        });
 
-    events.on('kill', function (data) {
-        io.emit('kill', data);
+        events.on('serverstart', function () {
+            console.log('Server started');
+        });
+    }
+
+    /**
+     * Create the HTTP router
+     */
+    const router = new Router({
+        prefix: '/server'
     });
 
-    events.on('serverstart', function () {
-        console.log('Server started');
+    router.get('/', function *() {
+        this.body = 'Server';
     });
+
+    return {
+        router: router,
+        startSocketServer: startSocketServer
+    }
 };
-
-server.get('/', function *(next) {
-    this.body = 'Server';
-});

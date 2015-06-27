@@ -1,3 +1,5 @@
+'use strict';
+
 var cluster = require('cluster'),
     stopSignals = [
         'SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
