@@ -40,6 +40,7 @@ module.exports = function Events(gameEvents, database, io) {
         }
 
         gameEvents.on('kill', function (data) {
+            console.log(data);
             co(function *() {
                 const attacker = yield database.Player.getPlayer(data.attacker);
                 const victim = yield database.Player.getPlayer(data.victim);
@@ -48,20 +49,42 @@ module.exports = function Events(gameEvents, database, io) {
 
                 attacker.elo += eloChange;
                 attacker.kills++;
+                attacker.displayName = data.attacker.name;
                 victim.elo -= eloChange;
                 victim.deaths++;
+                victim.displayName = data.victim.name;
 
 
                 io.emit('kill', {
                     attacker: {
                         displayName: attacker.displayName,
-                        elo: Math.round(attacker.elo * 100) / 100
+                        elo: Math.round(attacker.elo * 100) / 100,
+                        bot: attacker.steamID.substr(0, 3) === 'BOT'
                     },
                     victim: {
                         displayName: victim.displayName,
-                        elo: Math.round(victim.elo * 100) / 100
+                        elo: Math.round(victim.elo * 100) / 100,
+                        bot: victim.steamID.substr(0, 3) === 'BOT'
                     },
                     eloChange: Math.round(eloChange * 100) / 100
+                });
+
+                io.emit('scoreboardchange', {
+                    elo: Math.round(attacker.elo * 100) / 100,
+                    displayName: attacker.displayName,
+                    tag: attacker.steamID,
+                    kills: attacker.kills,
+                    deaths: attacker.deaths,
+                    bot: attacker.steamID.substr(0, 3) === 'BOT'
+                });
+
+                io.emit('scoreboardchange', {
+                    elo: Math.round(victim.elo * 100) / 100,
+                    displayName: victim.displayName,
+                    tag: victim.steamID,
+                    kills: victim.kills,
+                    deaths: victim.deaths,
+                    bot: victim.steamID.substr(0, 3) === 'BOT'
                 });
 
 
@@ -77,7 +100,33 @@ module.exports = function Events(gameEvents, database, io) {
         });
 
         io.on('connect', function (client) {
-            client.emit('map', state.get('map'));
+            co(function *() {
+                client.emit('map', state.get('map'));
+
+                const players = yield database.Player.findAll({
+                    where: {
+                        updatedAt: {
+                            $gt: new Date(new Date() - 7 * 24 * 60 * 60 * 1000)
+                        }
+                    },
+                    limit: 100,
+                    order: [
+                        ['elo', 'desc']
+                    ]
+                });
+                players.forEach(function (player) {
+                    client.emit('scoreboardchange', {
+                        elo: Math.round(player.elo * 100) / 100,
+                        displayName: player.displayName,
+                        tag: player.steamID,
+                        kills: player.kills,
+                        deaths: player.deaths,
+                        bot: player.steamID.substr(0, 3) === 'BOT'
+                    });
+                });
+            }).catch(function (err) {
+                console.error(err.stack);
+            });
         });
     }).catch(function (err) {
         console.error(err.stack);
